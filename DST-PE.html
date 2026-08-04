@@ -210,9 +210,35 @@
     display:flex;
     justify-content:space-between;
   }
+
+  /* ===== proteksi dasar: nonaktifkan seleksi teks ===== */
+  body{
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+  }
+
+  /* ===== peringatan devtools ===== */
+  .peringatan-devtools{
+    display:none;
+    position:fixed;
+    top:0; left:0; right:0;
+    background:var(--merah);
+    color:#fff;
+    font-size:12px;
+    text-align:center;
+    padding:8px 12px;
+    z-index:9999;
+    letter-spacing:.02em;
+  }
 </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
+
+<div class="peringatan-devtools" id="peringatanDevtools">
+  Alat pengembang (DevTools) terdeteksi terbuka.
+</div>
 
 <div class="panel">
   <div class="panel-kop">
@@ -246,18 +272,62 @@
       <p class="catatan-kaki">
         Klik unduh untuk memulai proses. Berkas berukuran besar dapat memerlukan waktu beberapa detik sebelum unduhan dimulai.
       </p>
+      <p class="catatan-kaki" style="margin-top:10px; color:#b04a4a;">
+        Kami tidak bertanggung jawab atas berkas yang Anda unduh. Mohon pikirkan kembali, atau unduh dari sumber resmi/tempat yang seharusnya.
+      </p>
     </div>
 
   </div>
 
   <div class="panel-footer">
-    <span>Diverifikasi otomatis berdasarkan alamat IP</span>
+    <span>Diverifikasi otomatis berdasarkan wilayah</span>
     <span id="jamPeriksa"></span>
   </div>
 </div>
 
 <script>
 (function(){
+
+  // =====================================================
+  // 0. PROTEKSI DASAR (klik kanan, shortcut, seleksi)
+  //    Catatan: ini hanya penghalang ringan untuk pengunjung
+  //    biasa, BUKAN pengaman sesungguhnya. Siapa pun yang cukup
+  //    tahu tetap bisa lihat kode lewat view-source, tab Network,
+  //    atau langsung baca repo GitHub-nya. Perlindungan yang
+  //    sebenarnya harus dilakukan di server (lihat proxy Worker).
+  // =====================================================
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+  document.addEventListener('keydown', function(e){
+    const kombinasiTerblokir =
+      e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) ||
+      (e.ctrlKey && ['U','S'].includes(e.key.toUpperCase())) ||
+      (e.metaKey && e.altKey && ['I','J','C'].includes(e.key.toUpperCase())); // Mac
+
+    if (kombinasiTerblokir){
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  document.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+  // Deteksi kasar apakah DevTools sedang terbuka (berbasis selisih
+  // ukuran window). Tidak 100% akurat di semua browser/perangkat,
+  // terutama saat DevTools "undocked" atau di beberapa mobile browser
+  // - jadi sifatnya cuma peringatan, halaman tetap bisa dipakai.
+  const elPeringatanDevtools = document.getElementById('peringatanDevtools');
+  const AMBANG_BATAS = 160;
+
+  function cekDevtools(){
+    const bedaLebar = window.outerWidth - window.innerWidth;
+    const bedaTinggi = window.outerHeight - window.innerHeight;
+    const kemungkinanTerbuka = bedaLebar > AMBANG_BATAS || bedaTinggi > AMBANG_BATAS;
+    elPeringatanDevtools.style.display = kemungkinanTerbuka ? 'block' : 'none';
+  }
+  setInterval(cekDevtools, 1000);
+  window.addEventListener('resize', cekDevtools);
 
   // =====================================================
   // 1. DAFTAR BERKAS
@@ -269,9 +339,9 @@
   // =====================================================
   const DAFTAR_BERKAS = [
     {
-      nama: "DontStarve Together PE.zip",
+      nama: "Don't Starve Together PE.zip",
       ukuran: "2.1 GB",
-      link: "https://drive.google.com/file/d/1PeogujaCPXIAuN9p2aRrSIQO-sNRxFZr/view?usp=sharing",
+      link: "https://drive.google.com/file/d/1PeogujaCPXIAuN9p2aRrSIQO-sNRxFZr/view?usp=drive_link",
       aktif: true
     },
   ];
