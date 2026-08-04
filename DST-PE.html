@@ -548,22 +548,26 @@
   ];
 
   // =====================================================
-  // 1b. KONFIGURASI PENGHITUNG UNDUHAN (countapi.xyz)
-  //     Gratis, tanpa perlu daftar. Namespace dibuat otomatis
-  //     dari domain kamu supaya tidak bentrok dengan pengguna
-  //     countapi.xyz lain.
+  // 1b. KONFIGURASI PENGHITUNG UNDUHAN
+  //     countapi.xyz (layanan lama) SUDAH TIDAK AKTIF per 2026,
+  //     jadi kita pakai penerusnya: countapi.mileshilliard.com
+  //     (API serupa, gratis, tanpa perlu daftar). Layanan ini
+  //     tidak pakai namespace terpisah, jadi kita gabungkan
+  //     domain + halaman + nama file jadi satu key unik supaya
+  //     tidak bentrok dengan pengguna lain (semua key di sana
+  //     bersifat publik/terbuka).
   // =====================================================
-  const NAMESPACE_HITUNG = ('pu-' + location.hostname).replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'pusat-unduhan-default';
+  const DASAR_API_HITUNG = 'https://countapi.mileshilliard.com/api/v1';
 
   function kunciHitung(berkas, idx){
-    const sumber = location.pathname + '-' + (berkas.idHitung || berkas.nama || idx);
+    const sumber = location.hostname + '-' + location.pathname + '-' + (berkas.idHitung || berkas.nama || idx);
     return sumber.replace(/[^a-z0-9-]/gi, '').toLowerCase().slice(0, 64) || ('berkas-' + idx);
   }
 
   async function ambilJumlahUnduhan(berkas, idx){
     try{
       const kunci = kunciHitung(berkas, idx);
-      const res = await fetch(`https://api.countapi.xyz/get/${NAMESPACE_HITUNG}/${kunci}`, { cache: 'no-store' });
+      const res = await fetch(`${DASAR_API_HITUNG}/get/${kunci}`, { cache: 'no-store' });
       if (!res.ok) throw new Error('gagal ambil');
       const data = await res.json();
       return typeof data.value === 'number' ? data.value : 0;
@@ -578,7 +582,7 @@
       // keepalive:true penting di sini - tanpa ini, request akan
       // DIBATALKAN browser begitu halaman pindah (window.location.href)
       // sebelum request sempat selesai, sehingga hitungan tidak nambah.
-      const res = await fetch(`https://api.countapi.xyz/hit/${NAMESPACE_HITUNG}/${kunci}`, {
+      const res = await fetch(`${DASAR_API_HITUNG}/hit/${kunci}`, {
         cache: 'no-store',
         keepalive: true
       });
