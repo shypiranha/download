@@ -377,6 +377,129 @@
     line-height:1.55;
   }
 
+  /* ===== halaman menunggu (boarding / hitung mundur) ===== */
+  .menunggu{ display:none; text-align:center; }
+
+  .menunggu .kode{
+    display:inline-block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.1em;
+    background:var(--kertas-redup);
+    border:1px solid var(--garis);
+    padding:3px 9px;
+    margin-bottom:14px;
+    color:#8a7f66;
+  }
+
+  .menunggu h2{
+    font-family:'Bebas Neue', sans-serif;
+    font-weight:400;
+    font-size:21px;
+    letter-spacing:.02em;
+    line-height:1.3;
+    margin-bottom:6px;
+    color:var(--tinta);
+  }
+
+  .menunggu .nama-berkas-tunggu{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:#8a8272;
+    margin-bottom:22px;
+    word-break:break-word;
+  }
+
+  .angka-hitung-mundur{
+    width:96px; height:96px;
+    margin:0 auto 22px;
+    border-radius:50%;
+    border:3px solid var(--navy);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .angka-hitung-mundur::before{
+    content:'';
+    position:absolute;
+    inset:5px;
+    border:1px dashed var(--emas);
+    border-radius:50%;
+    opacity:.6;
+  }
+  .angka-hitung-mundur span{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:40px;
+    line-height:1;
+    color:var(--navy);
+  }
+
+  .landasan{
+    position:relative;
+    height:44px;
+    margin:0 auto 10px;
+    max-width:400px;
+  }
+  .garis-jalur{
+    position:absolute;
+    left:0; right:0; top:50%;
+    height:0;
+    border-top:2px dashed var(--garis);
+  }
+  .garis-jalur::before,
+  .garis-jalur::after{
+    content:'';
+    position:absolute;
+    top:-5px;
+    width:10px; height:10px;
+    border-radius:50%;
+  }
+  .garis-jalur::before{ left:-2px; background:var(--navy); }
+  .garis-jalur::after{ right:-2px; background:var(--merah); }
+
+.pesawat-ikon{
+  position:absolute;
+  top:50%;
+  left:0%;
+  transform:translate(-50%,-62%) rotate(90deg);
+  width:30px;
+  height:30px;
+  color:var(--merah);
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));
+  will-change:left;
+}
+
+  .batang-progres{
+    max-width:400px;
+    height:5px;
+    margin:4px auto 20px;
+    background:var(--kertas-redup);
+    border:1px solid var(--garis);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .batang-progres-isi{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--navy), var(--merah));
+    transition:width 1s linear;
+  }
+
+  .menunggu .catatan-tunggu{
+    font-size:12.5px;
+    color:#6b6455;
+    line-height:1.6;
+    max-width:360px;
+    margin:0 auto;
+  }
+
+  .menunggu .catatan-tunggu b{ color:var(--tinta); }
+
+  .lewati-tunggu{
+    display:none; /* sengaja disembunyikan: unduhan otomatis berjalan setelah hitung mundur selesai */
+  }
+
   /* ===== kaki tiket ===== */
   .tiket-kaki{
     padding:14px 26px;
@@ -424,6 +547,11 @@
     .robekan::after{ left:auto; right:-8px; }
     .tombol-unduh{ padding:12px; }
     .kode-tiket{ display:none; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .pesawat-ikon{ transition:none !important; }
+    .batang-progres-isi{ transition:none !important; }
   }
 </style>
 </head>
@@ -474,6 +602,33 @@
       <p class="catatan-peringatan">
         Kami tidak bertanggung jawab atas berkas yang Anda unduh. Mohon pikirkan kembali, atau unduh dari sumber resmi/tempat yang seharusnya.
       </p>
+    </div>
+
+    <div class="menunggu" id="menungguWadah">
+      <div class="kode">BOARDING&middot;PASS</div>
+      <h2>Berkas Anda sedang diberangkatkan&hellip;</h2>
+      <p class="nama-berkas-tunggu" id="namaBerkasTunggu">&mdash;</p>
+
+      <div class="angka-hitung-mundur">
+        <span id="angkaHitung">15</span>
+      </div>
+
+      <div class="landasan">
+        <div class="garis-jalur"></div>
+        <svg class="pesawat-ikon" id="pesawatIkon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21.5 15.5v-2l-8-5V4c0-1.1-.9-2-1.5-2s-1.5.9-1.5 2v4.5l-8 5v2l8-2.5V17l-2.5 1.7V20l4-1.2 4 1.2v-1.3L14 17v-4.5l7.5 3z"/>
+        </svg>
+      </div>
+
+      <div class="batang-progres">
+        <div class="batang-progres-isi" id="batangProgresIsi"></div>
+      </div>
+
+      <p class="catatan-tunggu">
+        Unduhan <b>otomatis dimulai</b> begitu hitung mundur mencapai nol. Mohon jangan tutup atau muat ulang halaman ini.
+      </p>
+
+      <button class="coba-lagi lewati-tunggu" id="tombolLewati">Lewati</button>
     </div>
 
   </div>
@@ -626,6 +781,16 @@
   const elJamPeriksa = document.getElementById('jamPeriksa');
   const elTombolCoba = document.getElementById('tombolCobaLagi');
 
+  // ---- elemen halaman menunggu (boarding / hitung mundur) ----
+  const elMenunggu = document.getElementById('menungguWadah');
+  const elNamaBerkasTunggu = document.getElementById('namaBerkasTunggu');
+  const elAngkaHitung = document.getElementById('angkaHitung');
+  const elPesawat = document.getElementById('pesawatIkon');
+  const elBatangProgresIsi = document.getElementById('batangProgresIsi');
+
+  const DURASI_TUNGGU_DETIK = 15;
+  let timerHitungMundurAktif = null;
+
   function tampilJam(){
     const now = new Date();
     elJamPeriksa.textContent = "Diperiksa " + now.toLocaleTimeString('id-ID');
@@ -683,17 +848,74 @@
     });
 
     setTimeout(function(){
-      window.location.href = berkas.link;
-      setTimeout(function(){
-        tombolEl.disabled = false;
-        tombolEl.textContent = "Unduh";
-      }, 2500);
+      tombolEl.disabled = false;
+      tombolEl.textContent = "Unduh";
+      tampilkanMenunggu(berkas);
     }, 500);
+  }
+
+  // =====================================================
+  // 3. HALAMAN MENUNGGU: hitung mundur 15 detik + pesawat
+  //    terbang dari kiri ke kanan landasan, kecepatannya
+  //    disamakan dengan durasi hitung mundur (transisi CSS
+  //    15s linear), lalu otomatis redirect ke link unduhan.
+  // =====================================================
+  function tampilkanMenunggu(berkas){
+    elDiizinkan.style.display = 'none';
+    elBlokir.style.display = 'none';
+    elMemeriksa.style.display = 'none';
+    elMenunggu.style.display = 'block';
+
+    elNamaBerkasTunggu.textContent = berkas.nama;
+
+    jalankanHitungMundur(berkas);
+  }
+
+  function jalankanHitungMundur(berkas){
+    // reset kalau sebelumnya ada timer berjalan (jaga-jaga)
+    if (timerHitungMundurAktif) clearInterval(timerHitungMundurAktif);
+
+    let sisaDetik = DURASI_TUNGGU_DETIK;
+    elAngkaHitung.textContent = sisaDetik;
+    elBatangProgresIsi.style.transition = 'none';
+    elBatangProgresIsi.style.width = '0%';
+
+    // Terbangkan pesawat dari kiri (0%) ke kanan (100%) selama
+    // persis DURASI_TUNGGU_DETIK detik, memakai CSS transition
+    // supaya pergerakannya mulus dan sinkron dengan hitung mundur.
+    elPesawat.style.transition = 'none';
+    elPesawat.style.left = '0%';
+    // paksa reflow supaya browser "melihat" posisi awal sebelum
+    // transition baru diterapkan
+    void elPesawat.offsetWidth;
+    void elBatangProgresIsi.offsetWidth;
+
+    requestAnimationFrame(function(){
+      elPesawat.style.transition = 'left ' + DURASI_TUNGGU_DETIK + 's linear';
+      elBatangProgresIsi.style.transition = 'width ' + DURASI_TUNGGU_DETIK + 's linear';
+      elPesawat.style.left = '100%';
+      elBatangProgresIsi.style.width = '100%';
+    });
+
+    timerHitungMundurAktif = setInterval(function(){
+      sisaDetik -= 1;
+
+      if (sisaDetik <= 0){
+        clearInterval(timerHitungMundurAktif);
+        timerHitungMundurAktif = null;
+        elAngkaHitung.textContent = '0';
+        window.location.href = berkas.link;
+        return;
+      }
+
+      elAngkaHitung.textContent = sisaDetik;
+    }, 1000);
   }
 
   function tampilkanBlokir(kodeNegara, namaNegara){
     elMemeriksa.style.display = 'none';
     elDiizinkan.style.display = 'none';
+    elMenunggu.style.display = 'none';
     elBlokir.style.display = 'block';
     elLokasiTeks.textContent = namaNegara ? (namaNegara + " (" + kodeNegara + ")") : "Tidak diketahui";
     tampilJam();
@@ -702,6 +924,7 @@
   function tampilkanDiizinkan(){
     elMemeriksa.style.display = 'none';
     elBlokir.style.display = 'none';
+    elMenunggu.style.display = 'none';
     elDiizinkan.style.display = 'block';
     tampilkanBerkas();
     tampilJam();
@@ -715,6 +938,7 @@
     elMemeriksa.style.display = 'flex';
     elBlokir.style.display = 'none';
     elDiizinkan.style.display = 'none';
+    elMenunggu.style.display = 'none';
 
     for (const sumber of SUMBER_GEO){
       try{
