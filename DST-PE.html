@@ -575,7 +575,13 @@
   async function tambahJumlahUnduhan(berkas, idx){
     try{
       const kunci = kunciHitung(berkas, idx);
-      const res = await fetch(`https://api.countapi.xyz/hit/${NAMESPACE_HITUNG}/${kunci}`, { cache: 'no-store' });
+      // keepalive:true penting di sini - tanpa ini, request akan
+      // DIBATALKAN browser begitu halaman pindah (window.location.href)
+      // sebelum request sempat selesai, sehingga hitungan tidak nambah.
+      const res = await fetch(`https://api.countapi.xyz/hit/${NAMESPACE_HITUNG}/${kunci}`, {
+        cache: 'no-store',
+        keepalive: true
+      });
       if (!res.ok) throw new Error('gagal tambah');
       const data = await res.json();
       return typeof data.value === 'number' ? data.value : null;
