@@ -3,81 +3,146 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pusat Unduhan</title>
+<title>Pusat Unduhan &mdash; Verifikasi Wilayah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --merah: #C1272D;
-    --merah-gelap: #8f1c21;
-    --tinta: #1a1a1a;
-    --kertas: #FAF7F2;
-    --kertas-redup: #EFE9DF;
-    --garis: #ddd3c4;
-    --sukses: #2f7a4f;
-    --nonaktif: #b9b2a3;
+    --navy: #12213D;
+    --navy-deep: #0A1424;
+    --navy-line: #2A3B5C;
+    --merah: #C8272A;
+    --merah-gelap: #8f1c1e;
+    --emas: #B08D57;
+    --kertas: #F6F1E7;
+    --kertas-redup: #EAE2D2;
+    --tinta: #211F1A;
+    --hijau: #2F6B4F;
+    --hijau-bg: #E8F0EA;
+    --garis: #D8CDB4;
+    --nonaktif: #b3a98f;
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
 
   body{
-    background:var(--kertas);
+    background:
+      radial-gradient(ellipse at 50% -10%, #1c3159 0%, var(--navy-deep) 55%, #060b15 100%);
     color:var(--tinta);
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
     min-height:100vh;
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:24px;
+    padding:32px 20px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
   }
 
-  .panel{
+  .tiket{
     width:100%;
-    max-width:560px;
-    background:#fff;
-    border:1px solid var(--garis);
-    border-radius:2px;
-    box-shadow: 0 1px 0 var(--garis);
+    max-width:520px;
+    background:var(--kertas);
+    border-radius:6px;
+    box-shadow:
+      0 30px 60px -20px rgba(0,0,0,.55),
+      0 0 0 1px rgba(255,255,255,.04);
     overflow:hidden;
+    position:relative;
   }
 
-  .panel-kop{
-    padding:22px 28px;
-    border-bottom:3px solid var(--merah);
+  /* ===== kepala tiket ===== */
+  .tiket-kepala{
+    background:linear-gradient(155deg, var(--navy) 0%, #0d1930 100%);
+    color:#EFE9DC;
+    padding:22px 26px 26px;
+    position:relative;
+  }
+
+  .segel{
+    width:38px; height:38px;
+    border:1.5px solid var(--emas);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    position:relative;
+  }
+  .segel::before{
+    content:'';
+    position:absolute;
+    width:26px; height:26px;
+    border:1px dashed var(--emas);
+    border-radius:50%;
+    opacity:.6;
+  }
+  .segel-titik{
+    width:6px; height:6px;
+    background:var(--emas);
+    border-radius:50%;
+  }
+
+  .kepala-baris{
     display:flex;
     align-items:center;
     gap:14px;
   }
 
-  .lambang{
-    width:34px; height:24px;
-    display:flex; flex-direction:column;
-    border:1px solid var(--tinta);
-    flex-shrink:0;
-  }
-  .lambang span{flex:1;}
-  .lambang span:first-child{background:var(--merah);}
-  .lambang span:last-child{background:#fff;}
-
-  .kop-teks h1{
-    font-size:15px;
+  .kepala-teks h1{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:24px;
     letter-spacing:.06em;
+    line-height:1;
+  }
+  .kepala-teks p{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.09em;
     text-transform:uppercase;
-    font-weight:700;
-  }
-  .kop-teks p{
-    font-size:12px;
-    color:#777;
-    margin-top:2px;
+    color:var(--emas);
+    margin-top:6px;
   }
 
-  .isi{padding:28px;}
+  .kode-tiket{
+    position:absolute;
+    top:22px; right:26px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:.05em;
+    color:#8492b0;
+    text-align:right;
+    line-height:1.6;
+  }
 
-  /* status: memeriksa */
+  /* ===== perforasi ===== */
+  .perforasi{
+    position:relative;
+    height:0;
+    border-top:2px dashed var(--garis);
+    margin:0 0;
+  }
+  .perforasi::before,
+  .perforasi::after{
+    content:'';
+    position:absolute;
+    top:-11px;
+    width:22px; height:22px;
+    border-radius:50%;
+    background:
+      radial-gradient(ellipse at 50% -10%, #1c3159 0%, var(--navy-deep) 55%, #060b15 100%);
+  }
+  .perforasi::before{ left:-11px; }
+  .perforasi::after{ right:-11px; }
+
+  /* ===== isi tiket ===== */
+  .badan{ padding:26px; position:relative; }
+
   .status-baris{
     display:flex; align-items:center; gap:12px;
-    font-size:14px; color:#555;
+    font-size:13.5px; color:#6b6455;
+    font-family:'JetBrains Mono', monospace;
   }
   .spinner{
-    width:16px; height:16px;
+    width:15px; height:15px;
     border:2px solid var(--garis);
     border-top-color:var(--merah);
     border-radius:50%;
@@ -86,105 +151,185 @@
   }
   @keyframes putar{to{transform:rotate(360deg);}}
 
-  /* blokir */
-  .blokir{display:none;}
+  /* ===== stempel (signature element) ===== */
+  @keyframes munculStempel{
+    0%{ transform:scale(2) rotate(-18deg); opacity:0; }
+    60%{ transform:scale(.94) rotate(-9deg); opacity:1; }
+    100%{ transform:scale(1) rotate(-11deg); opacity:.92; }
+  }
+  .stempel{
+    width:108px; height:108px;
+    border:3px solid currentColor;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    margin:2px auto 18px;
+    transform:rotate(-11deg);
+    animation:munculStempel .5s ease-out;
+    mix-blend-mode:multiply;
+    position:relative;
+  }
+  .stempel::before{
+    content:'';
+    position:absolute;
+    inset:6px;
+    border:1px dashed currentColor;
+    border-radius:50%;
+    opacity:.7;
+  }
+  .stempel b{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:15.5px;
+    letter-spacing:.05em;
+    line-height:1.15;
+    text-align:center;
+  }
+  .stempel span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:8px;
+    letter-spacing:.12em;
+    margin-top:2px;
+  }
+  .stempel.ditolak{ color:var(--merah); }
+  .stempel.diterima{ color:var(--hijau); }
+
+  /* ===== blokir ===== */
+  .blokir{ display:none; text-align:center; }
   .blokir .kode{
     display:inline-block;
-    font-size:11px;
-    letter-spacing:.08em;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.1em;
     background:var(--kertas-redup);
     border:1px solid var(--garis);
-    padding:3px 8px;
-    margin-bottom:14px;
+    padding:3px 9px;
+    margin-bottom:16px;
     color:#8a7f66;
   }
   .blokir h2{
-    font-size:19px;
-    line-height:1.4;
+    font-family:'Bebas Neue', sans-serif;
+    font-weight:400;
+    font-size:22px;
+    letter-spacing:.02em;
+    line-height:1.3;
     margin-bottom:10px;
+    color:var(--tinta);
   }
   .blokir p{
-    font-size:14px;
-    color:#555;
+    font-size:13.5px;
+    color:#6b6455;
     line-height:1.6;
+    max-width:360px;
+    margin:0 auto;
   }
   .blokir .lokasi-terdeteksi{
-    margin-top:18px;
-    padding:12px 14px;
+    margin:18px auto 0;
+    max-width:340px;
+    padding:11px 14px;
     background:var(--kertas-redup);
     border-left:3px solid var(--merah);
-    font-size:13px;
-    color:#555;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:#6b6455;
+    text-align:left;
   }
   .blokir .lokasi-terdeteksi b{color:var(--tinta);}
 
   .coba-lagi{
-    margin-top:20px;
+    margin-top:22px;
     background:none;
     border:1px solid var(--tinta);
     color:var(--tinta);
-    padding:9px 18px;
-    font-size:13px;
+    padding:9px 20px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
     cursor:pointer;
-    letter-spacing:.02em;
   }
-  .coba-lagi:hover{background:var(--tinta); color:#fff;}
+  .coba-lagi:hover{background:var(--tinta); color:var(--kertas);}
 
-  /* diizinkan */
-  .diizinkan{display:none;}
-  .diizinkan .lolos{
-    display:inline-flex; align-items:center; gap:6px;
-    font-size:12px;
-    color:var(--sukses);
-    background:#eaf5ee;
-    border:1px solid #cde6d6;
-    padding:4px 10px;
-    margin-bottom:16px;
-  }
+  /* ===== diizinkan ===== */
+  .diizinkan{ display:none; }
+  .diizinkan .stempel{ margin-bottom:20px; }
 
   .daftar-berkas{
     display:flex;
     flex-direction:column;
-    gap:1px;
-    background:var(--garis);
-    border:1px solid var(--garis);
+    gap:14px;
   }
 
   .berkas{
     background:#fff;
-    padding:14px 16px;
+    border:1px solid var(--garis);
+    border-radius:4px;
     display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
+    align-items:stretch;
+    overflow:hidden;
   }
+  .berkas.non-aktif{ background:#fbfaf6; }
 
-  .berkas.non-aktif{background:#fbfaf8;}
-
-  .berkas-info b{font-size:14px; display:block;}
-  .berkas-info span{font-size:12px; color:#888;}
+  .berkas-info{
+    flex:1;
+    padding:14px 16px;
+    min-width:0;
+  }
+  .berkas-info b{
+    font-size:14px;
+    display:block;
+    font-weight:600;
+  }
+  .berkas-info span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:#8a8272;
+  }
 
   .status-nonaktif{
     display:inline-block;
-    margin-top:3px;
-    font-size:11px;
+    margin-top:5px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
     color:var(--merah);
     background:#fbeceb;
     border:1px solid #f0d4d2;
     padding:1px 7px;
-    letter-spacing:.02em;
   }
+
+  .robekan{
+    position:relative;
+    width:0;
+    border-left:2px dashed var(--garis);
+  }
+  .robekan::before,
+  .robekan::after{
+    content:'';
+    position:absolute;
+    left:-8px;
+    width:16px; height:16px;
+    border-radius:50%;
+    background:var(--kertas);
+  }
+  .robekan::before{ top:-8px; }
+  .robekan::after{ bottom:-8px; }
 
   .tombol-unduh{
     background:var(--merah);
     color:#fff;
     border:none;
-    padding:9px 16px;
-    font-size:13px;
+    padding:0 20px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
     font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
     cursor:pointer;
     white-space:nowrap;
-    letter-spacing:.02em;
+    writing-mode:horizontal-tb;
   }
   .tombol-unduh:hover{background:var(--merah-gelap);}
   .tombol-unduh:disabled{background:#ccc; cursor:progress;}
@@ -196,41 +341,68 @@
   .tombol-unduh.nonaktif:hover{background:var(--nonaktif);}
 
   .catatan-kaki{
-    margin-top:20px;
+    margin-top:22px;
     font-size:12px;
-    color:#999;
-    line-height:1.5;
+    color:#948c7a;
+    line-height:1.55;
+  }
+  .catatan-peringatan{
+    margin-top:10px;
+    padding:10px 12px;
+    background:#fbeceb;
+    border-left:3px solid var(--merah);
+    font-size:12px;
+    color:#8f2d2d;
+    line-height:1.55;
   }
 
-  .panel-footer{
-    padding:14px 28px;
-    border-top:1px solid var(--garis);
-    font-size:11px;
-    color:#aaa;
+  /* ===== kaki tiket ===== */
+  .tiket-kaki{
+    padding:14px 26px;
+    border-top:1px dashed var(--garis);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:.04em;
+    color:#a49c89;
     display:flex;
     justify-content:space-between;
+    align-items:center;
+    background:var(--kertas-redup);
+  }
+  .barcode{
+    display:flex;
+    gap:2px;
+    align-items:flex-end;
+    height:16px;
+  }
+  .barcode span{
+    display:block;
+    width:2px;
+    background:#c4b99e;
   }
 
-  /* ===== proteksi dasar: nonaktifkan seleksi teks ===== */
-  body{
-    -webkit-user-select:none;
-    -moz-user-select:none;
-    -ms-user-select:none;
-    user-select:none;
-  }
-
-  /* ===== peringatan devtools ===== */
   .peringatan-devtools{
     display:none;
     position:fixed;
     top:0; left:0; right:0;
     background:var(--merah);
     color:#fff;
-    font-size:12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.04em;
     text-align:center;
     padding:8px 12px;
     z-index:9999;
-    letter-spacing:.02em;
+  }
+
+  @media (max-width:480px){
+    .berkas{ flex-direction:column; }
+    .robekan{ border-left:none; border-top:2px dashed var(--garis); width:auto; height:0; }
+    .robekan::before,.robekan::after{ top:-8px; }
+    .robekan::before{ left:-8px; }
+    .robekan::after{ left:auto; right:-8px; }
+    .tombol-unduh{ padding:12px; }
+    .kode-tiket{ display:none; }
   }
 </style>
 </head>
@@ -240,49 +412,61 @@
   Alat pengembang (DevTools) terdeteksi terbuka.
 </div>
 
-<div class="panel">
-  <div class="panel-kop">
-    <div class="lambang"><span></span><span></span></div>
-    <div class="kop-teks">
-      <h1>Pusat Unduhan</h1>
-      <p>Akses terbatas &mdash; wilayah Indonesia</p>
+<div class="tiket">
+
+  <div class="tiket-kepala">
+    <div class="kode-tiket">GEO&middot;ID<br>NO. 0417&mdash;A</div>
+    <div class="kepala-baris">
+      <div class="segel"><div class="segel-titik"></div></div>
+      <div class="kepala-teks">
+        <h1>PUSAT UNDUHAN</h1>
+        <p>Akses Terbatas &middot; Wilayah Indonesia</p>
+      </div>
     </div>
   </div>
 
-  <div class="isi">
+  <div class="perforasi"></div>
+
+  <div class="badan">
 
     <div class="status-baris" id="statusMemeriksa">
       <div class="spinner"></div>
-      <span>Memeriksa lokasi akses Anda&hellip;</span>
+      <span>MEMERIKSA LOKASI AKSES ANDA&hellip;</span>
     </div>
 
     <div class="blokir" id="blokirWadah">
-      <div class="kode">AKSES-DITOLAK &middot; GEO-403</div>
+      <div class="stempel ditolak"><b>DITOLAK</b><span>GEO&middot;403</span></div>
       <h2>Halaman ini hanya dapat diakses dari wilayah Indonesia.</h2>
       <p>Sistem kami mendeteksi permintaan Anda berasal dari luar Indonesia, sehingga akses ke berkas unduhan tidak dapat diberikan.</p>
       <div class="lokasi-terdeteksi">
-        Lokasi terdeteksi: <b id="lokasiTeks">&mdash;</b>
+        LOKASI TERDETEKSI: <b id="lokasiTeks">&mdash;</b>
       </div>
-      <button class="coba-lagi" id="tombolCobaLagi">Periksa ulang lokasi</button>
+      <button class="coba-lagi" id="tombolCobaLagi">Periksa Ulang Lokasi</button>
     </div>
 
     <div class="diizinkan" id="diizinkanWadah">
-      <div class="lolos">&#10003; Lokasi terverifikasi: Indonesia</div>
+      <div class="stempel diterima"><b>TERVERIFIKASI</b><span>INDONESIA</span></div>
       <div class="daftar-berkas" id="daftarBerkas"></div>
       <p class="catatan-kaki">
         Klik unduh untuk memulai proses. Berkas berukuran besar dapat memerlukan waktu beberapa detik sebelum unduhan dimulai.
       </p>
-      <p class="catatan-kaki" style="margin-top:10px; color:#b04a4a;">
+      <p class="catatan-peringatan">
         Kami tidak bertanggung jawab atas berkas yang Anda unduh. Mohon pikirkan kembali, atau unduh dari sumber resmi/tempat yang seharusnya.
       </p>
     </div>
 
   </div>
 
-  <div class="panel-footer">
-    <span>Diverifikasi otomatis berdasarkan wilayah</span>
-    <span id="jamPeriksa"></span>
+  <div class="tiket-kaki">
+    <span id="jamPeriksa">Diverifikasi otomatis</span>
+    <div class="barcode" aria-hidden="true">
+      <span style="height:16px"></span><span style="height:10px"></span><span style="height:14px"></span>
+      <span style="height:8px"></span><span style="height:16px"></span><span style="height:12px"></span>
+      <span style="height:9px"></span><span style="height:15px"></span><span style="height:11px"></span>
+      <span style="height:16px"></span><span style="height:7px"></span><span style="height:13px"></span>
+    </div>
   </div>
+
 </div>
 
 <script>
@@ -313,10 +497,6 @@
 
   document.addEventListener('dragstart', function(e){ e.preventDefault(); });
 
-  // Deteksi kasar apakah DevTools sedang terbuka (berbasis selisih
-  // ukuran window). Tidak 100% akurat di semua browser/perangkat,
-  // terutama saat DevTools "undocked" atau di beberapa mobile browser
-  // - jadi sifatnya cuma peringatan, halaman tetap bisa dipakai.
   const elPeringatanDevtools = document.getElementById('peringatanDevtools');
   const AMBANG_BATAS = 160;
 
@@ -339,9 +519,9 @@
   // =====================================================
   const DAFTAR_BERKAS = [
     {
-      nama: "Don't Starve Together PE.zip",
+      nama: "DontStarve Together PE.zip",
       ukuran: "2.1 GB",
-      link: "https://drive.google.com/file/d/1PeogujaCPXIAuN9p2aRrSIQO-sNRxFZr/view?usp=drive_link",
+      link: "https://drive.google.com/file/d/1PeogujaCPXIAuN9p2aRrSIQO-sNRxFZr/view?usp=sharing",
       aktif: true
     },
   ];
@@ -382,6 +562,7 @@
           '<span>' + b.ukuran + '</span>' +
           (aktif ? '' : '<span class="status-nonaktif">Nonaktif</span>') +
         '</div>' +
+        '<div class="robekan"></div>' +
         '<button class="tombol-unduh' + (aktif ? '' : ' nonaktif') + '" data-idx="' + idx + '"' +
           (aktif ? '' : ' disabled') + '>' +
           (aktif ? 'Unduh' : 'Nonaktif') +
@@ -399,8 +580,6 @@
   }
 
   function mulaiUnduh(berkas, tombolEl){
-    // Jaga-jaga di sisi client: kalau entah bagaimana tombol nonaktif
-    // terklik (mis. lewat DevTools), unduhan tetap tidak dijalankan.
     if (berkas.aktif === false) return;
 
     tombolEl.disabled = true;
