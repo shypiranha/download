@@ -300,6 +300,27 @@
     padding:1px 7px;
   }
 
+  .jumlah-unduh{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    margin-top:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.03em;
+    color:#8a8272;
+  }
+  .jumlah-unduh b{
+    color:var(--tinta);
+    font-weight:700;
+  }
+  .jumlah-unduh .titik-hidup{
+    width:5px; height:5px;
+    border-radius:50%;
+    background:var(--hijau);
+    flex-shrink:0;
+  }
+
   .robekan{
     position:relative;
     width:0;
@@ -527,6 +548,48 @@
   ];
 
   // =====================================================
+  // 1b. KONFIGURASI PENGHITUNG UNDUHAN (countapi.xyz)
+  //     Gratis, tanpa perlu daftar. Namespace dibuat otomatis
+  //     dari domain kamu supaya tidak bentrok dengan pengguna
+  //     countapi.xyz lain.
+  // =====================================================
+  const NAMESPACE_HITUNG = ('pu-' + location.hostname).replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'pusat-unduhan-default';
+
+  function kunciHitung(berkas, idx){
+    const sumber = location.pathname + '-' + (berkas.idHitung || berkas.nama || idx);
+    return sumber.replace(/[^a-z0-9-]/gi, '').toLowerCase().slice(0, 64) || ('berkas-' + idx);
+  }
+
+  async function ambilJumlahUnduhan(berkas, idx){
+    try{
+      const kunci = kunciHitung(berkas, idx);
+      const res = await fetch(`https://api.countapi.xyz/get/${NAMESPACE_HITUNG}/${kunci}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('gagal ambil');
+      const data = await res.json();
+      return typeof data.value === 'number' ? data.value : 0;
+    } catch(e){
+      return null; // tampilkan sebagai tidak tersedia
+    }
+  }
+
+  async function tambahJumlahUnduhan(berkas, idx){
+    try{
+      const kunci = kunciHitung(berkas, idx);
+      const res = await fetch(`https://api.countapi.xyz/hit/${NAMESPACE_HITUNG}/${kunci}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('gagal tambah');
+      const data = await res.json();
+      return typeof data.value === 'number' ? data.value : null;
+    } catch(e){
+      return null;
+    }
+  }
+
+  function perbaruiTampilanJumlah(idx, nilai){
+    const elJumlah = document.querySelector('.jumlah-unduh[data-idx-hitung="' + idx + '"] b');
+    if (elJumlah) elJumlah.textContent = (nilai === null ? '—' : nilai.toLocaleString('id-ID'));
+  }
+
+  // =====================================================
   // 2. KONFIGURASI GEO-CHECK
   // =====================================================
   const KODE_NEGARA_DIIZINKAN = "ID"; // Indonesia
@@ -561,6 +624,9 @@
           '<b>' + b.nama + '</b>' +
           '<span>' + b.ukuran + '</span>' +
           (aktif ? '' : '<span class="status-nonaktif">Nonaktif</span>') +
+          '<div class="jumlah-unduh" data-idx-hitung="' + idx + '">' +
+            '<span class="titik-hidup"></span>Sudah diunduh <b>&hellip;</b> kali' +
+          '</div>' +
         '</div>' +
         '<div class="robekan"></div>' +
         '<button class="tombol-unduh' + (aktif ? '' : ' nonaktif') + '" data-idx="' + idx + '"' +
@@ -571,19 +637,30 @@
       elDaftarBerkas.appendChild(baris);
     });
 
+    // Ambil jumlah unduhan tiap berkas (tanpa menambah hitungan)
+    DAFTAR_BERKAS.forEach(function(b, idx){
+      ambilJumlahUnduhan(b, idx).then(function(nilai){
+        perbaruiTampilanJumlah(idx, nilai);
+      });
+    });
+
     elDaftarBerkas.querySelectorAll('.tombol-unduh:not(.nonaktif)').forEach(function(tombol){
       tombol.addEventListener('click', function(){
         const idx = this.getAttribute('data-idx');
-        mulaiUnduh(DAFTAR_BERKAS[idx], this);
+        mulaiUnduh(DAFTAR_BERKAS[idx], this, idx);
       });
     });
   }
 
-  function mulaiUnduh(berkas, tombolEl){
+  function mulaiUnduh(berkas, tombolEl, idx){
     if (berkas.aktif === false) return;
 
     tombolEl.disabled = true;
     tombolEl.textContent = "Menyiapkan\u2026";
+
+    tambahJumlahUnduhan(berkas, idx).then(function(nilai){
+      if (nilai !== null) perbaruiTampilanJumlah(idx, nilai);
+    });
 
     setTimeout(function(){
       window.location.href = berkas.link;
