@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pusat Unduhan &mdash; Verifikasi Wilayah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #12213D;
+    --navy-deep: #0A1424;
+    --navy-line: #2A3B5C;
+    --merah: #C8272A;
+    --merah-gelap: #8f1c1e;
+    --emas: #B08D57;
+    --kertas: #F6F1E7;
+    --kertas-redup: #EAE2D2;
+    --tinta: #211F1A;
+    --hijau: #2F6B4F;
+    --hijau-bg: #E8F0EA;
+    --garis: #D8CDB4;
+    --nonaktif: #b3a98f;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    background:
+      radial-gradient(ellipse at 50% -10%, #1c3159 0%, var(--navy-deep) 55%, #060b15 100%);
+    color:var(--tinta);
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 20px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+  }
+
+  .tiket{
+    width:100%;
+    max-width:520px;
+    background:var(--kertas);
+    border-radius:6px;
+    box-shadow:
+      0 30px 60px -20px rgba(0,0,0,.55),
+      0 0 0 1px rgba(255,255,255,.04);
+    overflow:hidden;
+    position:relative;
+  }
+
+  /* ===== kepala tiket ===== */
+  .tiket-kepala{
+    background:linear-gradient(155deg, var(--navy) 0%, #0d1930 100%);
+    color:#EFE9DC;
+    padding:22px 26px 26px;
+    position:relative;
+  }
+
+  .segel{
+    width:38px; height:38px;
+    border:1.5px solid var(--emas);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    position:relative;
+  }
+  .segel::before{
+    content:'';
+    position:absolute;
+    width:26px; height:26px;
+    border:1px dashed var(--emas);
+    border-radius:50%;
+    opacity:.6;
+  }
+  .segel-titik{
+    width:6px; height:6px;
+    background:var(--emas);
+    border-radius:50%;
+  }
+
+  .kepala-baris{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+
+  .kepala-teks h1{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:24px;
+    letter-spacing:.06em;
+    line-height:1;
+  }
+  .kepala-teks p{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--emas);
+    margin-top:6px;
+  }
+
+  .kode-tiket{
+    position:absolute;
+    top:22px; right:26px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:.05em;
+    color:#8492b0;
+    text-align:right;
+    line-height:1.6;
+  }
+
+  /* ===== perforasi ===== */
+  .perforasi{
+    position:relative;
+    height:0;
+    border-top:2px dashed var(--garis);
+    margin:0 0;
+  }
+  .perforasi::before,
+  .perforasi::after{
+    content:'';
+    position:absolute;
+    top:-11px;
+    width:22px; height:22px;
+    border-radius:50%;
+    background:
+      radial-gradient(ellipse at 50% -10%, #1c3159 0%, var(--navy-deep) 55%, #060b15 100%);
+  }
+  .perforasi::before{ left:-11px; }
+  .perforasi::after{ right:-11px; }
+
+  /* ===== isi tiket ===== */
+  .badan{ padding:26px; position:relative; }
+
+  .status-baris{
+    display:flex; align-items:center; gap:12px;
+    font-size:13.5px; color:#6b6455;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .spinner{
+    width:15px; height:15px;
+    border:2px solid var(--garis);
+    border-top-color:var(--merah);
+    border-radius:50%;
+    animation:putar .8s linear infinite;
+    flex-shrink:0;
+  }
+  @keyframes putar{to{transform:rotate(360deg);}}
+
+  /* ===== stempel (signature element) ===== */
+  @keyframes munculStempel{
+    0%{ transform:scale(2) rotate(-18deg); opacity:0; }
+    60%{ transform:scale(.94) rotate(-9deg); opacity:1; }
+    100%{ transform:scale(1) rotate(-11deg); opacity:.92; }
+  }
+  .stempel{
+    width:108px; height:108px;
+    border:3px solid currentColor;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    margin:2px auto 18px;
+    transform:rotate(-11deg);
+    animation:munculStempel .5s ease-out;
+    mix-blend-mode:multiply;
+    position:relative;
+  }
+  .stempel::before{
+    content:'';
+    position:absolute;
+    inset:6px;
+    border:1px dashed currentColor;
+    border-radius:50%;
+    opacity:.7;
+  }
+  .stempel b{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:15.5px;
+    letter-spacing:.05em;
+    line-height:1.15;
+    text-align:center;
+  }
+  .stempel span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:8px;
+    letter-spacing:.12em;
+    margin-top:2px;
+  }
+  .stempel.ditolak{ color:var(--merah); }
+  .stempel.diterima{ color:var(--hijau); }
+
+  /* ===== blokir ===== */
+  .blokir{ display:none; text-align:center; }
+  .blokir .kode{
+    display:inline-block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.1em;
+    background:var(--kertas-redup);
+    border:1px solid var(--garis);
+    padding:3px 9px;
+    margin-bottom:16px;
+    color:#8a7f66;
+  }
+  .blokir h2{
+    font-family:'Bebas Neue', sans-serif;
+    font-weight:400;
+    font-size:22px;
+    letter-spacing:.02em;
+    line-height:1.3;
+    margin-bottom:10px;
+    color:var(--tinta);
+  }
+  .blokir p{
+    font-size:13.5px;
+    color:#6b6455;
+    line-height:1.6;
+    max-width:360px;
+    margin:0 auto;
+  }
+  .blokir .lokasi-terdeteksi{
+    margin:18px auto 0;
+    max-width:340px;
+    padding:11px 14px;
+    background:var(--kertas-redup);
+    border-left:3px solid var(--merah);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:#6b6455;
+    text-align:left;
+  }
+  .blokir .lokasi-terdeteksi b{color:var(--tinta);}
+
+  .coba-lagi{
+    margin-top:22px;
+    background:none;
+    border:1px solid var(--tinta);
+    color:var(--tinta);
+    padding:9px 20px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    cursor:pointer;
+  }
+  .coba-lagi:hover{background:var(--tinta); color:var(--kertas);}
+
+  /* ===== diizinkan ===== */
+  .diizinkan{ display:none; }
+  .diizinkan .stempel{ margin-bottom:20px; }
+
+  .daftar-berkas{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .berkas{
+    background:#fff;
+    border:1px solid var(--garis);
+    border-radius:4px;
+    display:flex;
+    align-items:stretch;
+    overflow:hidden;
+  }
+  .berkas.non-aktif{ background:#fbfaf6; }
+
+  .berkas-info{
+    flex:1;
+    padding:14px 16px;
+    min-width:0;
+  }
+  .berkas-info b{
+    font-size:14px;
+    display:block;
+    font-weight:600;
+  }
+  .berkas-info span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:#8a8272;
+  }
+
+  .status-nonaktif{
+    display:inline-block;
+    margin-top:5px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--merah);
+    background:#fbeceb;
+    border:1px solid #f0d4d2;
+    padding:1px 7px;
+  }
+
+  .jumlah-unduh{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    margin-top:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.03em;
+    color:#8a8272;
+  }
+  .jumlah-unduh b{
+    color:var(--tinta);
+    font-weight:700;
+  }
+  .jumlah-unduh .titik-hidup{
+    width:5px; height:5px;
+    border-radius:50%;
+    background:var(--hijau);
+    flex-shrink:0;
+  }
+
+  .robekan{
+    position:relative;
+    width:0;
+    border-left:2px dashed var(--garis);
+  }
+  .robekan::before,
+  .robekan::after{
+    content:'';
+    position:absolute;
+    left:-8px;
+    width:16px; height:16px;
+    border-radius:50%;
+    background:var(--kertas);
+  }
+  .robekan::before{ top:-8px; }
+  .robekan::after{ bottom:-8px; }
+
+  .tombol-unduh{
+    background:var(--merah);
+    color:#fff;
+    border:none;
+    padding:0 20px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    white-space:nowrap;
+    writing-mode:horizontal-tb;
+  }
+  .tombol-unduh:hover{background:var(--merah-gelap);}
+  .tombol-unduh:disabled{background:#ccc; cursor:progress;}
+
+  .tombol-unduh.nonaktif{
+    background:var(--nonaktif);
+    cursor:not-allowed;
+  }
+  .tombol-unduh.nonaktif:hover{background:var(--nonaktif);}
+
+  .catatan-kaki{
+    margin-top:22px;
+    font-size:12px;
+    color:#948c7a;
+    line-height:1.55;
+  }
+  .catatan-peringatan{
+    margin-top:10px;
+    padding:10px 12px;
+    background:#fbeceb;
+    border-left:3px solid var(--merah);
+    font-size:12px;
+    color:#8f2d2d;
+    line-height:1.55;
+  }
+
+  /* ===== kaki tiket ===== */
+  .tiket-kaki{
+    padding:14px 26px;
+    border-top:1px dashed var(--garis);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:.04em;
+    color:#a49c89;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--kertas-redup);
+  }
+  .barcode{
+    display:flex;
+    gap:2px;
+    align-items:flex-end;
+    height:16px;
+  }
+  .barcode span{
+    display:block;
+    width:2px;
+    background:#c4b99e;
+  }
+
+  .peringatan-devtools{
+    display:none;
+    position:fixed;
+    top:0; left:0; right:0;
+    background:var(--merah);
+    color:#fff;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.04em;
+    text-align:center;
+    padding:8px 12px;
+    z-index:9999;
+  }
+
+  @media (max-width:480px){
+    .berkas{ flex-direction:column; }
+    .robekan{ border-left:none; border-top:2px dashed var(--garis); width:auto; height:0; }
+    .robekan::before,.robekan::after{ top:-8px; }
+    .robekan::before{ left:-8px; }
+    .robekan::after{ left:auto; right:-8px; }
+    .tombol-unduh{ padding:12px; }
+    .kode-tiket{ display:none; }
+  }
+</style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="peringatan-devtools" id="peringatanDevtools">
+  Alat pengembang (DevTools) terdeteksi terbuka.
+</div>
+
+<div class="tiket">
+
+  <div class="tiket-kepala">
+    <div class="kode-tiket">GEO&middot;ID<br>NO. 0417&mdash;A</div>
+    <div class="kepala-baris">
+      <div class="segel"><div class="segel-titik"></div></div>
+      <div class="kepala-teks">
+        <h1>PUSAT UNDUHAN</h1>
+        <p>Akses Terbatas &middot; Wilayah Indonesia</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="perforasi"></div>
+
+  <div class="badan">
+
+    <div class="status-baris" id="statusMemeriksa">
+      <div class="spinner"></div>
+      <span>MEMERIKSA LOKASI AKSES ANDA&hellip;</span>
+    </div>
+
+    <div class="blokir" id="blokirWadah">
+      <div class="stempel ditolak"><b>DITOLAK</b><span>GEO&middot;403</span></div>
+      <h2>Halaman ini hanya dapat diakses dari wilayah Indonesia.</h2>
+      <p>Sistem kami mendeteksi permintaan Anda berasal dari luar Indonesia, sehingga akses ke berkas unduhan tidak dapat diberikan.</p>
+      <div class="lokasi-terdeteksi">
+        LOKASI TERDETEKSI: <b id="lokasiTeks">&mdash;</b>
+      </div>
+      <button class="coba-lagi" id="tombolCobaLagi">Periksa Ulang Lokasi</button>
+    </div>
+
+    <div class="diizinkan" id="diizinkanWadah">
+      <div class="stempel diterima"><b>TERVERIFIKASI</b><span>INDONESIA</span></div>
+      <div class="daftar-berkas" id="daftarBerkas"></div>
+      <p class="catatan-kaki">
+        Klik unduh untuk memulai proses. Berkas berukuran besar dapat memerlukan waktu beberapa detik sebelum unduhan dimulai.
+      </p>
+      <p class="catatan-peringatan">
+        Kami tidak bertanggung jawab atas berkas yang Anda unduh. Mohon pikirkan kembali, atau unduh dari sumber resmi/tempat yang seharusnya.
+      </p>
+    </div>
+
+  </div>
+
+  <div class="tiket-kaki">
+    <span id="jamPeriksa">Diverifikasi otomatis</span>
+    <div class="barcode" aria-hidden="true">
+      <span style="height:16px"></span><span style="height:10px"></span><span style="height:14px"></span>
+      <span style="height:8px"></span><span style="height:16px"></span><span style="height:12px"></span>
+      <span style="height:9px"></span><span style="height:15px"></span><span style="height:11px"></span>
+      <span style="height:16px"></span><span style="height:7px"></span><span style="height:13px"></span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+
+  // =====================================================
+  // 0. PROTEKSI DASAR (klik kanan, shortcut, seleksi)
+  //    Catatan: ini hanya penghalang ringan untuk pengunjung
+  //    biasa, BUKAN pengaman sesungguhnya. Siapa pun yang cukup
+  //    tahu tetap bisa lihat kode lewat view-source, tab Network,
+  //    atau langsung baca repo GitHub-nya. Perlindungan yang
+  //    sebenarnya harus dilakukan di server (lihat proxy Worker).
+  // =====================================================
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+  document.addEventListener('keydown', function(e){
+    const kombinasiTerblokir =
+      e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) ||
+      (e.ctrlKey && ['U','S'].includes(e.key.toUpperCase())) ||
+      (e.metaKey && e.altKey && ['I','J','C'].includes(e.key.toUpperCase())); // Mac
+
+    if (kombinasiTerblokir){
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  document.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+  const elPeringatanDevtools = document.getElementById('peringatanDevtools');
+  const AMBANG_BATAS = 160;
+
+  function cekDevtools(){
+    const bedaLebar = window.outerWidth - window.innerWidth;
+    const bedaTinggi = window.outerHeight - window.innerHeight;
+    const kemungkinanTerbuka = bedaLebar > AMBANG_BATAS || bedaTinggi > AMBANG_BATAS;
+    elPeringatanDevtools.style.display = kemungkinanTerbuka ? 'block' : 'none';
+  }
+  setInterval(cekDevtools, 1000);
+  window.addEventListener('resize', cekDevtools);
+
+  // =====================================================
+  // 1. DAFTAR BERKAS
+  //    - link  : ganti dengan URL unduhan kamu sendiri (mis. URL
+  //              Cloudflare Worker, atau link apa pun). Tinggal
+  //              tempel di sini, tidak perlu ubah bagian lain.
+  //    - aktif : true = tombol unduh bisa diklik & jalan
+  //              false = tombol otomatis nonaktif, unduhan diblokir
+  // =====================================================
+  const DAFTAR_BERKAS = [
+    {
+      nama: "DontStarve Together PE.zip",
+      ukuran: "2.1 GB",
+      link: "https://drive.google.com/file/d/1PeogujaCPXIAuN9p2aRrSIQO-sNRxFZr/view?usp=sharing",
+      aktif: true
+    },
+  ];
+
+  // =====================================================
+  // 1b. KONFIGURASI PENGHITUNG UNDUHAN
+  //     countapi.xyz (layanan lama) SUDAH TIDAK AKTIF per 2026,
+  //     jadi kita pakai penerusnya: countapi.mileshilliard.com
+  //     (API serupa, gratis, tanpa perlu daftar). Layanan ini
+  //     tidak pakai namespace terpisah, jadi kita gabungkan
+  //     domain + halaman + nama file jadi satu key unik supaya
+  //     tidak bentrok dengan pengguna lain (semua key di sana
+  //     bersifat publik/terbuka).
+  // =====================================================
+  const DASAR_API_HITUNG = 'https://countapi.mileshilliard.com/api/v1';
+
+  function kunciHitung(berkas, idx){
+    const sumber = location.hostname + '-' + location.pathname + '-' + (berkas.idHitung || berkas.nama || idx);
+    return sumber.replace(/[^a-z0-9-]/gi, '').toLowerCase().slice(0, 64) || ('berkas-' + idx);
+  }
+
+  async function ambilJumlahUnduhan(berkas, idx){
+    try{
+      const kunci = kunciHitung(berkas, idx);
+      const res = await fetch(`${DASAR_API_HITUNG}/get/${kunci}`, { cache: 'no-store' });
+
+      // Key yang belum pernah "dihit" sama sekali akan mengembalikan
+      // 404 - itu wajar untuk file yang belum pernah diunduh, jadi
+      // dianggap 0, bukan error.
+      if (res.status === 404) return 0;
+      if (!res.ok) throw new Error('gagal ambil');
+
+      const data = await res.json();
+      // API mengembalikan value sebagai TEKS (mis. "3"), bukan angka,
+      // jadi perlu dikonversi eksplisit.
+      const nilai = Number(data.value);
+      return Number.isFinite(nilai) ? nilai : 0;
+    } catch(e){
+      return null; // tampilkan sebagai tidak tersedia
+    }
+  }
+
+  async function tambahJumlahUnduhan(berkas, idx){
+    try{
+      const kunci = kunciHitung(berkas, idx);
+      // keepalive:true penting di sini - tanpa ini, request akan
+      // DIBATALKAN browser begitu halaman pindah (window.location.href)
+      // sebelum request sempat selesai, sehingga hitungan tidak nambah.
+      const res = await fetch(`${DASAR_API_HITUNG}/hit/${kunci}`, {
+        cache: 'no-store',
+        keepalive: true
+      });
+      if (!res.ok) throw new Error('gagal tambah');
+      const data = await res.json();
+      const nilai = Number(data.value);
+      return Number.isFinite(nilai) ? nilai : null;
+    } catch(e){
+      return null;
+    }
+  }
+
+  function perbaruiTampilanJumlah(idx, nilai){
+    const elJumlah = document.querySelector('.jumlah-unduh[data-idx-hitung="' + idx + '"] b');
+    if (elJumlah) elJumlah.textContent = (nilai === null ? '—' : nilai.toLocaleString('id-ID'));
+  }
+
+  // =====================================================
+  // 2. KONFIGURASI GEO-CHECK
+  // =====================================================
+  const KODE_NEGARA_DIIZINKAN = "ID"; // Indonesia
+  const SUMBER_GEO = [
+    "https://ipwho.is/",
+    "https://ipapi.co/json/"
+  ];
+
+  const elMemeriksa = document.getElementById('statusMemeriksa');
+  const elBlokir = document.getElementById('blokirWadah');
+  const elDiizinkan = document.getElementById('diizinkanWadah');
+  const elLokasiTeks = document.getElementById('lokasiTeks');
+  const elDaftarBerkas = document.getElementById('daftarBerkas');
+  const elJamPeriksa = document.getElementById('jamPeriksa');
+  const elTombolCoba = document.getElementById('tombolCobaLagi');
+
+  function tampilJam(){
+    const now = new Date();
+    elJamPeriksa.textContent = "Diperiksa " + now.toLocaleTimeString('id-ID');
+  }
+
+  function tampilkanBerkas(){
+    elDaftarBerkas.innerHTML = "";
+    DAFTAR_BERKAS.forEach(function(b, idx){
+      const aktif = b.aktif !== false; // default true kalau tidak ditulis
+
+      const baris = document.createElement('div');
+      baris.className = 'berkas' + (aktif ? '' : ' non-aktif');
+
+      baris.innerHTML =
+        '<div class="berkas-info">' +
+          '<b>' + b.nama + '</b>' +
+          '<span>' + b.ukuran + '</span>' +
+          (aktif ? '' : '<span class="status-nonaktif">Nonaktif</span>') +
+          '<div class="jumlah-unduh" data-idx-hitung="' + idx + '">' +
+            '<span class="titik-hidup"></span>Sudah diunduh <b>&hellip;</b> kali' +
+          '</div>' +
+        '</div>' +
+        '<div class="robekan"></div>' +
+        '<button class="tombol-unduh' + (aktif ? '' : ' nonaktif') + '" data-idx="' + idx + '"' +
+          (aktif ? '' : ' disabled') + '>' +
+          (aktif ? 'Unduh' : 'Nonaktif') +
+        '</button>';
+
+      elDaftarBerkas.appendChild(baris);
+    });
+
+    // Ambil jumlah unduhan tiap berkas (tanpa menambah hitungan)
+    DAFTAR_BERKAS.forEach(function(b, idx){
+      ambilJumlahUnduhan(b, idx).then(function(nilai){
+        perbaruiTampilanJumlah(idx, nilai);
+      });
+    });
+
+    elDaftarBerkas.querySelectorAll('.tombol-unduh:not(.nonaktif)').forEach(function(tombol){
+      tombol.addEventListener('click', function(){
+        const idx = this.getAttribute('data-idx');
+        mulaiUnduh(DAFTAR_BERKAS[idx], this, idx);
+      });
+    });
+  }
+
+  // Ganti dengan URL Worker kamu (tanpa trailing slash)
+  const URL_WORKER = "https://nama-worker.username.workers.dev";
+
+  function mulaiUnduh(berkas, tombolEl, idx){
+    if (berkas.aktif === false) return;
+
+    tombolEl.disabled = true;
+    tombolEl.textContent = "Menyiapkan\u2026";
+
+    tambahJumlahUnduhan(berkas, idx).then(function(nilai){
+      if (nilai !== null) perbaruiTampilanJumlah(idx, nilai);
+    });
+
+    // Minta link sementara yang baru dari Worker (bukan link statis).
+    // Link ini otomatis kedaluwarsa beberapa menit setelah dibuat,
+    // jadi tidak bisa disimpan/dibagikan untuk dipakai berulang kali.
+    fetch(URL_WORKER + "/token?file=" + encodeURIComponent(berkas.aliasWorker || berkas.idHitung || ""))
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        if (!data.url) throw new Error('tidak ada url');
+        window.location.href = data.url;
+      })
+      .catch(function(){
+        // Fallback ke link statis di konfigurasi (mis. saat Worker
+        // belum disetel / gagal), supaya unduhan tetap bisa jalan.
+        window.location.href = berkas.link;
+      })
+      .finally(function(){
+        setTimeout(function(){
+          tombolEl.disabled = false;
+          tombolEl.textContent = "Unduh";
+        }, 2500);
+      });
+  }
+
+  function tampilkanBlokir(kodeNegara, namaNegara){
+    elMemeriksa.style.display = 'none';
+    elDiizinkan.style.display = 'none';
+    elBlokir.style.display = 'block';
+    elLokasiTeks.textContent = namaNegara ? (namaNegara + " (" + kodeNegara + ")") : "Tidak diketahui";
+    tampilJam();
+  }
+
+  function tampilkanDiizinkan(){
+    elMemeriksa.style.display = 'none';
+    elBlokir.style.display = 'none';
+    elDiizinkan.style.display = 'block';
+    tampilkanBerkas();
+    tampilJam();
+  }
+
+  function tampilkanGagalPeriksa(){
+    tampilkanBlokir(null, "Tidak dapat diverifikasi");
+  }
+
+  async function periksaLokasi(){
+    elMemeriksa.style.display = 'flex';
+    elBlokir.style.display = 'none';
+    elDiizinkan.style.display = 'none';
+
+    for (const sumber of SUMBER_GEO){
+      try{
+        const res = await fetch(sumber, { cache: "no-store" });
+        if (!res.ok) continue;
+        const data = await res.json();
+
+        const kode = data.country_code || (data.country && data.country.length === 2 ? data.country : null);
+        const nama = data.country || data.country_name || kode;
+
+        if (!kode) continue;
+
+        if (kode.toUpperCase() === KODE_NEGARA_DIIZINKAN){
+          tampilkanDiizinkan();
+        } else {
+          tampilkanBlokir(kode.toUpperCase(), nama);
+        }
+        return;
+      } catch(e){
+        continue;
+      }
+    }
+    tampilkanGagalPeriksa();
+  }
+
+  elTombolCoba.addEventListener('click', periksaLokasi);
+
+  periksaLokasi();
+})();
+</script>
+
+</body>
+</html>
