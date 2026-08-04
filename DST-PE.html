@@ -568,9 +568,18 @@
     try{
       const kunci = kunciHitung(berkas, idx);
       const res = await fetch(`${DASAR_API_HITUNG}/get/${kunci}`, { cache: 'no-store' });
+
+      // Key yang belum pernah "dihit" sama sekali akan mengembalikan
+      // 404 - itu wajar untuk file yang belum pernah diunduh, jadi
+      // dianggap 0, bukan error.
+      if (res.status === 404) return 0;
       if (!res.ok) throw new Error('gagal ambil');
+
       const data = await res.json();
-      return typeof data.value === 'number' ? data.value : 0;
+      // API mengembalikan value sebagai TEKS (mis. "3"), bukan angka,
+      // jadi perlu dikonversi eksplisit.
+      const nilai = Number(data.value);
+      return Number.isFinite(nilai) ? nilai : 0;
     } catch(e){
       return null; // tampilkan sebagai tidak tersedia
     }
@@ -588,7 +597,8 @@
       });
       if (!res.ok) throw new Error('gagal tambah');
       const data = await res.json();
-      return typeof data.value === 'number' ? data.value : null;
+      const nilai = Number(data.value);
+      return Number.isFinite(nilai) ? nilai : null;
     } catch(e){
       return null;
     }
